@@ -1,6 +1,18 @@
 """
 Project 1 for Math 273A. 
 
+To run this code use the following command:
+    python3 project1.py
+
+
+File requirements:
+    Ensure that the file dolphinorig.dat exists in the same directory as this file.
+
+
+Package Requirements:
+    numpy: pip install numpy
+
+
 Instructor: Li-Tien Cheng
 Academic Quarter: Fall 2019
 Author/student: Eric Weise
@@ -75,7 +87,7 @@ def partA():
         n_nodes = 4
     3) save the output image to eric-weise-part-1.dat
     """
-    pass
+    print('Part A has not yet been implemented')
 
 
 def partB():
@@ -88,7 +100,7 @@ def partB():
         n_nodes = 4
     3) save the output image to eric-weise-part-2.dat
     """
-    pass
+    print('Part B has not yet been implemented')
 
 
 def partC():
@@ -101,4 +113,10 @@ def partC():
         n_nodes = 10
     3) save the output image to eric-weise-part-3.dat
     """
-    pass
+    print('Part C has not yet been implemented')
+
+
+if __name__ == '__main__':
+    partA()
+    partB()
+    partC()
