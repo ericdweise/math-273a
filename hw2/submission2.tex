@@ -1,0 +1,148 @@
+\documentclass{article}
+
+% Title
+\title{Math 273A - Homework 2}
+\author{Eric Weise}
+
+% Packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage[margin=0.75in]{geometry}
+
+\begin{document}
+\maketitle
+
+\section*{Problem 4}
+{\bf Problem}\\
+The level set function \( \phi : \mathbb{R}^{2} \mapsto \mathbb{R} \) satisfies the evolution equation:
+\[ \phi_{t} + v \cdot \del \phi = 0 \]
+Given 
+\( \phi(x,y,t=0) = \phi_{0}(x,t) \) 
+verify that 
+\( \phi(x,y,t) = \phi_{0}(x-v_{1}t,y-v_{2}t) \)
+is a solution to the evolution equation.\\
+\\
+{\bf Solution }\\
+\begin{align*}
+    \phi_{t} 
+    & = \frac{d}{dt} \phi(x-v_{1}t,y-v_{2}t) \\
+    & = \frac{\partial \phi}{\partial x}\frac{d}{dt} (x-v_{1}t) + \frac{\partial \phi}{\partial y} \frac{d}{dt} (y-v_{2}t) \\
+    & = -v_{1} \frac{\partial \phi}{\partial x} - v_{2} \frac{\partial \phi}{\partial  y}
+\end{align*}
+and 
+\begin{align*}
+    v \cdot \nabla \phi
+    & = \big[v_{1},v_{2} \big] \cdot \Big[ \frac{\partial \phi}{\partial x} , \frac{\partial \phi}{\partial y} \Big] \\
+    & = v_{1} \frac{\partial \phi}{\partial x} + v_{2} \frac{\partial \phi}{\partial y}
+\end{align*}
+Then
+\begin{align*}
+    \phi_{t} + v \cdot \nabla \phi
+    & = -v_{1} \frac{\partial \phi}{\partial x} - v_{2} \frac{\partial \phi}{\partial  y}
+    + v_{1} \frac{\partial \phi}{\partial x} + v_{2} \frac{\partial \phi}{\partial y}\\
+    & = 0
+\end{align*}
+
+\section*{Problem 5}
+I have written the following code in Python to model the system in this problem.
+\begin{verbatim}
+def euler_init(h, n_points):
+    grid = [ h*v for v in range(-n_points,n_points) ]
+    graph = [ 1 if x > 0 else 0 for x in grid ]
+    return grid, graph
+
+def euler_left(k, h, prev_graph):
+    new_graph = [-1]*len(prev_graph)
+    for i in range(1, len(prev_graph)):
+        new_graph[i] = prev_graph[i] - k*(prev_graph[i] - prev_graph[i-1])/h
+
+    # assume left most point has same value its left.
+    new_graph[0] = prev_graph[0]
+    return new_graph
+
+def euler_right(k, h, prev_graph):
+    new_graph = [-1]*len(prev_graph)
+    for i in range(0, len(prev_graph)-1):
+        new_graph[i] = prev_graph[i] - k*(prev_graph[i+1] - prev_graph[i])/h
+
+    # assume right most point has same value to its right.
+    new_graph[-1] = prev_graph[-1]
+    return new_graph
+
+def euler(k, h, prev_graph):
+    new_graph = [-1]*len(prev_graph)
+    for i in range(1, len(prev_graph)-1):
+        new_graph[i] = prev_graph[i] - k*(prev_graph[i+1] - prev_graph[i-1])/2/h
+
+    # assume left most point has same value its left.
+    new_graph[0] = prev_graph[0] - k*(prev_graph[1] - prev_graph[0])/2/h
+
+    # assume right most point has same value to its right.
+    new_graph[-1] = prev_graph[-1] - k*(prev_graph[-1] - prev_graph[-2])/2/h
+
+    return new_graph
+\end{verbatim}
+
+\subsection*{Part B}
+The plot moves to the right, but retains the same shape. See after 1, 5, and 10 iterations of Euler's method applied to the left point.
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.3\linewidth}
+        \includegraphics[width=\linewidth]{submission2-assets/left_1.png}
+        \caption{Iteration 1}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\linewidth}
+        \includegraphics[width=\linewidth]{submission2-assets/left_5.png}
+        \caption{Iteration 5}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\linewidth}
+        \includegraphics[width=\linewidth]{submission2-assets/left_10.png}
+        \caption{Iteration 10}
+    \end{subfigure}
+    \caption{Applications of left\_euler(). (Problem 5b)}
+\end{figure}
+
+
+\subsection*{Part C}
+Yes, oscillations are present. \\
+In what way is the plot an extrapolation of the points to the right? The discontinuity in the direivative of the graph w.r.t. the x coordinate cause the extrapolation in time to become unstable. As the grid points get denser this oscillation will become more profound since the estimation of slope near the discontinuity will get larger.
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.3\linewidth}
+        \includegraphics[width=\linewidth]{submission2-assets/right_1.png}
+        \caption{Iteration 1}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\linewidth}
+        \includegraphics[width=\linewidth]{submission2-assets/right_2.png}
+        \caption{Iteration 2}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\linewidth}
+        \includegraphics[width=\linewidth]{submission2-assets/right_3.png}
+        \caption{Iteration 3}
+    \end{subfigure}
+    \caption{Application of right\_euler(). (Problem 5c)}
+\end{figure}
+
+
+\subsection*{Part D}
+Oscillations are still present. See plots for the application of Euler's function after 1, 5, and 10 iterations.
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.3\linewidth}
+        \includegraphics[width=\linewidth]{submission2-assets/euler_1.png}
+        \caption{Iteration 1}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\linewidth}
+        \includegraphics[width=\linewidth]{submission2-assets/euler_5.png}
+        \caption{Iteration 5}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\linewidth}
+        \includegraphics[width=\linewidth]{submission2-assets/euler_10.png}
+        \caption{Iteration 10}
+    \end{subfigure}
+    \caption{Application of right\_euler(). (Problem 5d)}
+\end{figure}
+
+\end{document}
