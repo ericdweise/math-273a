@@ -28,7 +28,7 @@ flops in Gaussian elimination of the banded matrix.
 
 \section*{Problem 2}
 The Jacobi method implements 
-\[ x^{(k+1)} = M^{-1}\big(N\vec{x} + \vec{b}\big) \]
+\[ x^{(k+1)} = M^{-1}\big(Nx + b\big) \]
 Where \(A = M-N\) with $M$ having the same diagonal elements as $A$, and $N$ having negative off diagonal elements and zeros on the diagonal.
 
 For each index $i$ in $x^{(k+1)}$ we have 
@@ -46,8 +46,18 @@ So, for each index $i$ in $x^{(k+1)}$ it takes $m_i+1$ flops. Summing this over 
 \[n + \sum_{i=1}^{n}m_i\]
 
 
-\section*{Problem3}
+\section*{Problem 3}
+NOTE: Operating under the following assumptions:
+\begin{itemize}
+    \item $A$ is the tridiagonal matrix with -2 on the diagonal and 1 on the upper and lower diagonals
+    \item $T$ is the matrix with $\frac{1}{2}$ on the main diagonal (not off diagonals)
+\end{itemize}
+
 \subsection*{Part A}
+Using the assumption that \( T = \begin{bmatrix} \frac{1}{2} & 0 & \dots \\ 0 & \frac{1}{2} &  \\ \vdots &  & \ddots \end{bmatrix} \)
+
+Then, $T$ plays the role of $M^{-1}$ in the Jacobi method: 
+\( x^{(k+1)} = M^{-1}\big(Nx + b\big) \)
 
 \subsection*{Part B}
 
