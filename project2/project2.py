@@ -14,7 +14,10 @@ Author/student: Eric Weise
 
 import numpy as np
 from math import floor
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
 
 class Phi(object):
@@ -36,15 +39,15 @@ class Phi(object):
         self.grid_step = grid_step
 
         # 1D coordinate axes
-        self.x_list = np.arange(xmin, grid_step, xmax)
-        self.y_list = np.arange(ymin, grid_step, ymax)
+        self.x_list = np.arange(xmin, xmax, grid_step)
+        self.y_list = np.arange(ymin, ymax, grid_step)
 
         # 2D grid to hold x and y values
         self.xgrid, self.ygrid = np.meshgrid(self.x_list, self.y_list)
 
         # 2D grid to hold Phi values
         # Initialize with Inf
-        self.phigrid = np.array()
+        self.phigrid = np.full(self.xgrid.shape, np.inf)
 
 
     def plot_phi(self, path):
@@ -55,7 +58,22 @@ class Phi(object):
         # https://matplotlib.org/mpl_toolkits/mplot3d/tutorial.html#surface-plots
         fig = plt.figure()
         ax = fig.gca(projection='3d')
-        surf = ax.plot_surface(self.xgrid, self.ygrid, self.phivals)
+        surf = ax.plot_surface(self.xgrid, self.ygrid, self.phigrid)
+
+        # Set axis limits
+        ax.set_xlim(self.xmin, self.xmax)
+        ax.set_ylim(self.ymin, self.ymax)
+        ax.set_zlim(-1, 0)
+
+        # Set number of ticks along axes
+        plt.locator_params(axis='x', nbins=3)
+        plt.locator_params(axis='y', nbins=3)
+        plt.locator_params(axis='z', nbins=2)
+
+        # set axis labels
+        plt.xlabel('X')
+        plt.ylabel('Y')
+
         plt.savefig(path)
 
 
@@ -70,7 +88,8 @@ class Phi(object):
         """
         Will add a circle to Phi.
         """
-        pass
+        newgrid = (self.xgrid - x)**2 + (self.ygrid - y)**2 - r**2
+        self.phigrid = np.minimum(self.phigrid, newgrid)
 
     def add_ellipse(self, x, y, r):
         """
@@ -79,12 +98,23 @@ class Phi(object):
         """
         pass
 
-    def add_rectangle(self, xmin, xmax, ymin, ymax, r):
+    def add_rectangle(self, xmin, xmax, ymin, ymax):
         """
         Will add a rectangle to Phi. The rectangle will be aligned with
         the coordinate axes.
         """
-        pass
+        newgrid = self.xgrid - xmax
+
+        newgrid1 = self.ygrid - ymax
+        newgrid = np.maximum(newgrid, newgrid1)
+
+        newgrid1 = xmin - self.xgrid
+        newgrid = np.maximum(newgrid, newgrid1)
+
+        newgrid1 = ymin - self.ygrid
+        newgrid = np.maximum(newgrid, newgrid1)
+
+        self.phigrid = np.minimum(self.phigrid, newgrid)
 
     def transport(self, k=0.01):
         """
@@ -100,4 +130,7 @@ class Phi(object):
 
 
 if __name__ == '__main__':
-    pass
+    phi = Phi()
+    phi.add_rectangle(-1, 0, -1, 0)
+    phi.add_rectangle(0, 1, 0, 1)
+    phi.plot_phi('two-rectangels.png')
