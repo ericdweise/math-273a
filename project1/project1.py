@@ -4,14 +4,11 @@ Project 1 for Math 273A.
 To run this code use the following command:
     python3 project1.py
 
-
 File requirements:
     Ensure that the file dolphinorig.dat exists in the same directory as this file.
 
-
 Package Requirements:
     numpy: pip install numpy
-
 
 Instructor: Li-Tien Cheng
 Academic Quarter: Fall 2019
@@ -40,16 +37,18 @@ def save_image(array, path):
         array: A 2D numpy array.
         path: The path where the image should be saved.
     """
+    pass
 
 
-def eno(array, n_samples, n_nodes):
+def eno(array, n_out, n_nodes):
     """
-    perform ENO on a 1D array, using n points for each interpolation.
-    Assumes Von Neumann boundary conditions.
+    Perform ENO on a 1D array at n_out evenly spaced points. Each point
+    interpolated will be found using n_nodes from array to perform the 
+    ENO. Assumes Von Neumann boundary conditions.
 
     Args:
         array: A 1D array of values that represent the original data.
-        n_samples: The number of samples to interpolate in the returned array.
+        n_out: The number of samples to interpolate. AKA, the length of the returned array.
         n_nodes: The number of original nodes to use in each interpolation.
 
     Returns:
