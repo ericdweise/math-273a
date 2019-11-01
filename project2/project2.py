@@ -20,6 +20,8 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
+TEST = False
+
 
 class Phi(object):
 
@@ -149,41 +151,94 @@ class Phi(object):
 
 
 if __name__ == '__main__':
-    # TESTING
-    # one circle
-    phi_circ = Phi()
-    phi_circ.add_circle(0,0,0.5)
-    phi_circ.plot_phi('circle-1-3d.png')
-    phi_circ.plot_level_set('circle-1-levelset.png')
-    phi_circ.plot_level_set('circle-1-levelset-25.png', 0.25)
+    if TEST:
+        # TESTING
+        # one circle
+        phi_circ = Phi()
+        phi_circ.add_circle(0,0,0.5)
+        phi_circ.plot_phi('circle-1-3d.png')
+        phi_circ.plot_level_set('circle-1-levelset.png')
+        phi_circ.plot_level_set('circle-1-levelset-25.png', 0.25)
 
-    # two circles
-    phi_2circ = Phi()
-    phi_2circ.add_circle(0.5, 0.5, 0.5)
-    phi_2circ.add_circle(-0.5, -0.5, 0.25)
-    phi_2circ.plot_phi('circle-2-3d.png')
-    phi_2circ.plot_level_set('circle-2--levelset.png')
+        # two circles
+        phi_2circ = Phi()
+        phi_2circ.add_circle(0.5, 0.5, 0.5)
+        phi_2circ.add_circle(-0.5, -0.5, 0.25)
+        phi_2circ.plot_phi('circle-2-3d.png')
+        phi_2circ.plot_level_set('circle-2--levelset.png')
 
-    # one rectangle
-    phi_rect = Phi()
-    phi_rect.add_rectangle(-0.5, 0.5, -0.75, 0.75)
-    phi_rect.plot_phi('rectangle-1-3d.png')
-    phi_rect.plot_level_set('rectangle-1--levelset.png')
+        # one rectangle
+        phi_rect = Phi()
+        phi_rect.add_rectangle(-0.5, 0.5, -0.75, 0.75)
+        phi_rect.plot_phi('rectangle-1-3d.png')
+        phi_rect.plot_level_set('rectangle-1--levelset.png')
 
-    # two rectangles
-    phi_2rect = Phi()
-    phi_2rect.add_rectangle(-0.75, 0, -0.75, 0)
-    phi_2rect.add_rectangle(0, 0.25, 0, 0.5)
-    phi_2rect.plot_phi('rectangle-2-3d.png')
-    phi_2rect.plot_level_set('rectangle-2-levelset.png')
-    phi_2rect.plot_level_set('rectangle-2-levelset-50.png', 0.5)
+        # two rectangles
+        phi_2rect = Phi()
+        phi_2rect.add_rectangle(-0.75, 0, -0.75, 0)
+        phi_2rect.add_rectangle(0, 0.25, 0, 0.5)
+        phi_2rect.plot_phi('rectangle-2-3d.png')
+        phi_2rect.plot_level_set('rectangle-2-levelset.png')
+        phi_2rect.plot_level_set('rectangle-2-levelset-50.png', 0.5)
 
-    # one ellipse
-    phi_parab = Phi()
-    phi_parab.add_ellipse(0,2,0,1)
-    phi_parab.plot_phi('ellipse-long-x-3d.png')
-    phi_parab.plot_level_set('ellipse-long-x-levelset.png')
-    phi_parab2 = Phi()
-    phi_parab2.add_ellipse(0.5,1,0,2)
-    phi_parab2.plot_phi('ellipse-long-y-3d.png')
-    phi_parab2.plot_level_set('ellipse-long-y-levelset.png')
+        # one ellipse
+        phi_parab = Phi()
+        phi_parab.add_ellipse(0,2,0,1)
+        phi_parab.plot_phi('ellipse-long-x-3d.png')
+        phi_parab.plot_level_set('ellipse-long-x-levelset.png')
+        phi_parab2 = Phi()
+        phi_parab2.add_ellipse(0.5,1,0,2)
+        phi_parab2.plot_phi('ellipse-long-y-3d.png')
+        phi_parab2.plot_level_set('ellipse-long-y-levelset.png')
+
+    
+    ##########
+    # PART 1 #
+    ##########
+    phi1 = Phi()
+
+    # circles
+    phi1.add_circle(-0.85, 0, 0.05)
+    phi1.add_circle(-0.25, 0, 0.1)
+    phi1.add_circle(0.5, 0.5, 0.15)
+
+    # ellipses
+    phi1.add_ellipse(0.75, 0.1, 0.05, 0.15)
+    phi1.add_ellipse(0.25, 0.3, -0.5, 0.1)
+
+    # rectangle
+    phi1.add_rectangle(-0.7, -0.5, -0.5, 0.5)
+
+    # Plot Initial Contour
+    phi1.plot_level_set('part-a-0.png')
+
+    for n in range(1,1001):
+        phi1.transport()
+        if n in (10, 50, 1000):
+            phi1.plot_level_set('part-a-{}.png'.format(n))
+
+
+    ##########
+    # PART 2 #
+    ##########
+    phi2 = Phi(eye_x=-0.75, eye_y=0.75)
+
+    # circles
+    phi2.add_circle(-0.85, 0, 0.05)
+    phi2.add_circle(-0.25, 0, 0.1)
+    phi2.add_circle(0.5, 0.5, 0.15)
+
+    # ellipses
+    phi2.add_ellipse(0.75, 0.1, 0.05, 0.15)
+    phi2.add_ellipse(0.25, 0.3, -0.5, 0.1)
+
+    # rectangle
+    phi2.add_rectangle(-0.7, -0.5, -0.5, 0.5)
+
+    # Plot Initial Contour
+    phi2.plot_level_set('part-b-0.png')
+
+    for n in range(1,1001):
+        phi2.transport()
+        if n in (10, 50, 1000):
+            phi2.plot_level_set('part-a-{}.png'.format(n))
