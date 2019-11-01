@@ -6,6 +6,7 @@ To run this code use the following command:
 
 Package Requirements:
     numpy: pip install numpy
+    matplotlib: pip install matplotlib
 
 Instructor: Li-Tien Cheng
 Academic Quarter: Fall 2019
@@ -68,7 +69,7 @@ class Phi(object):
         # Set number of ticks along axes
         plt.locator_params(axis='x', nbins=3)
         plt.locator_params(axis='y', nbins=3)
-        plt.locator_params(axis='z', nbins=2)
+        plt.locator_params(axis='z', nbins=3)
 
         # set axis labels
         plt.xlabel('X')
@@ -77,12 +78,28 @@ class Phi(object):
         plt.savefig(path)
 
 
-    def plot_level_set(self, value=0):
+    def plot_level_set(self, path, value=0):
         """Create a 2D plot of Phi(x,y)=value.
         Args:
             value: The value at which the level set is comuputed.
         """
-        pass
+        fig = plt.figure()
+        ax = fig.gca()
+        contour = ax.contour(self.xgrid, self.ygrid, self.phigrid, [value,])
+
+        # set axis limits
+        ax.set_xlim(self.xmin, self.xmax)
+        ax.set_ylim(self.ymin, self.ymax)
+
+        # set axis labels
+        plt.xlabel('X')
+        plt.ylabel('Y')
+
+        # Set axes to be same length
+        plt.gca().set_aspect('equal')
+
+        plt.savefig(path)
+
 
     def add_circle(self, x, y, r):
         """
@@ -137,28 +154,36 @@ if __name__ == '__main__':
     phi_circ = Phi()
     phi_circ.add_circle(0,0,0.5)
     phi_circ.plot_phi('circle-1-3d.png')
+    phi_circ.plot_level_set('circle-1-levelset.png')
+    phi_circ.plot_level_set('circle-1-levelset-25.png', 0.25)
 
     # two circles
     phi_2circ = Phi()
     phi_2circ.add_circle(0.5, 0.5, 0.5)
     phi_2circ.add_circle(-0.5, -0.5, 0.25)
     phi_2circ.plot_phi('circle-2-3d.png')
+    phi_2circ.plot_level_set('circle-2--levelset.png')
 
     # one rectangle
     phi_rect = Phi()
     phi_rect.add_rectangle(-0.5, 0.5, -0.75, 0.75)
     phi_rect.plot_phi('rectangle-1-3d.png')
+    phi_rect.plot_level_set('rectangle-1--levelset.png')
 
     # two rectangles
     phi_2rect = Phi()
-    phi_2rect.add_rectangle(-1, 0, -1, 0)
-    phi_2rect.add_rectangle(0, 1, 0, 1)
+    phi_2rect.add_rectangle(-0.75, 0, -0.75, 0)
+    phi_2rect.add_rectangle(0, 0.25, 0, 0.5)
     phi_2rect.plot_phi('rectangle-2-3d.png')
+    phi_2rect.plot_level_set('rectangle-2-levelset.png')
+    phi_2rect.plot_level_set('rectangle-2-levelset-50.png', 0.5)
 
     # one ellipse
     phi_parab = Phi()
     phi_parab.add_ellipse(0,2,0,1)
-    phi_parab.plot_phi('ellipse-long-x.png')
+    phi_parab.plot_phi('ellipse-long-x-3d.png')
+    phi_parab.plot_level_set('ellipse-long-x-levelset.png')
     phi_parab2 = Phi()
     phi_parab2.add_ellipse(0.5,1,0,2)
-    phi_parab2.plot_phi('ellipse-long-y.png')
+    phi_parab2.plot_phi('ellipse-long-y-3d.png')
+    phi_parab2.plot_level_set('ellipse-long-y-levelset.png')
