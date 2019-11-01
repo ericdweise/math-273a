@@ -91,7 +91,7 @@ class Phi(object):
         newgrid = (self.xgrid - x)**2 + (self.ygrid - y)**2 - r**2
         self.phigrid = np.minimum(self.phigrid, newgrid)
 
-    def add_ellipse(self, x, y, r):
+    def add_ellipse(self, x0, a, y0, b):
         """
         Will add an elipse to Phi. The major axis will be aligned with
         either the x or y coordinate axes.
@@ -130,7 +130,25 @@ class Phi(object):
 
 
 if __name__ == '__main__':
-    phi = Phi()
-    phi.add_rectangle(-1, 0, -1, 0)
-    phi.add_rectangle(0, 1, 0, 1)
-    phi.plot_phi('two-rectangels.png')
+    # TESTING
+    # one circle
+    phi_circ = Phi()
+    phi_circ.add_circle(0,0,0.5)
+    phi_circ.plot_phi('circle-1-3d.png')
+
+    # two circles
+    phi_2circ = Phi()
+    phi_2circ.add_circle(0.5, 0.5, 0.5)
+    phi_2circ.add_circle(-0.5, -0.5, 0.25)
+    phi_2circ.plot_phi('circle-2-3d.png')
+
+    # one rectangle
+    phi_rect = Phi()
+    phi_rect.add_rectangle(-0.5, 0.5, -0.75, 0.75)
+    phi_rect.plot_phi('rectangle-1-3d.png')
+
+    # two rectangles
+    phi_2rect = Phi()
+    phi_2rect.add_rectangle(-1, 0, -1, 0)
+    phi_2rect.add_rectangle(0, 1, 0, 1)
+    phi_2rect.plot_phi('rectangle-2-3d.png')
