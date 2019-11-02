@@ -20,13 +20,10 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
-TEST = False
+TEST = True
 
 
 class Phi(object):
-
-    # Resolution of the grid
-    grid_step_size = 0.02
 
     def __init__(self, xmin=-1, xmax=1, ymin=-1, ymax=1, grid_step=0.02, eye_x=0, eye_y=0):
         """Initialize grid with values of float('inf')"""
@@ -42,21 +39,25 @@ class Phi(object):
         self.grid_step = grid_step
 
         # 1D coordinate axes
-        self.x_list = np.arange(xmin, xmax, grid_step)
-        self.y_list = np.arange(ymin, ymax, grid_step)
+        xlist = np.arange(xmin, xmax + grid_step/2, grid_step)
+        ylist = np.arange(ymin, ymax + grid_step/2, grid_step)
 
         # 2D grid to hold x and y values
-        self.xgrid, self.ygrid = np.meshgrid(self.x_list, self.y_list)
+        self.xgrid, self.ygrid = np.meshgrid(xlist, ylist)
 
         # 2D grid to hold Phi values
-        # Initialize with Inf
+        # Initialize with Inf to accommodate min() for union
         self.phigrid = np.full(self.xgrid.shape, np.inf)
 
         # Set flow field
-        # TODO: set this 
-        flow_x, flow_y = np.meshgrid(self.x_list, self.y_list)
-        self.flow_x = flow_x / sqrt(eye_x**2 + eye_y**2)
-        self.flow_y = flow_y / sqrt(eye_x**2 + eye_y**2)
+        denom = np.sqrt((self.xgrid - eye_x)**2 + (self.ygrid - eye_y)**2)
+        with np.nditer(denom, op_flags=['readwrite']) as it:
+            for x in it:
+                if x == 0:
+                    x[...] = np.inf
+
+        self.flowx = np.divide(self.xgrid, denom)
+        self.flowy = np.divide(self.ygrid, denom)
 
 
     def plot_phi(self, path):
@@ -85,6 +86,10 @@ class Phi(object):
 
         plt.savefig(path)
 
+        plt.cla()
+        plt.clf()
+        plt.close()
+
 
     def plot_level_set(self, path, value=0):
         """Create a 2D plot of Phi(x,y)=value.
@@ -106,7 +111,14 @@ class Phi(object):
         # Set axes to be same length
         plt.gca().set_aspect('equal')
 
+        # plot eye point
+        ax.plot(self.eye_x, self.eye_y, 'ro')
+
         plt.savefig(path)
+
+        plt.cla()
+        plt.clf()
+        plt.close()
 
 
     def add_circle(self, x, y, r):
@@ -152,18 +164,22 @@ class Phi(object):
                 is provided then k=grid_step_size/2.
         """
         if k is None:
-            k = self.grid_step_size/2
+            k = self.grid_step/2
 
         C = k/self.grid_step
 
+        # TODO: This is not right!!! 
+        # newgrid = self.phigrid + C*(2*self.phigrid - self.phigrid - self.phigrid)
+        # TODO: Try this instead
         newgrid = np.empty_like(self.phigrid)
-
         for i in range(newgrid.shape[0]-1):
             for j in range(newgrid.shape[1]-1):
-                newgrid[i,j] = self.phigrid[i,j] + C*(2*self.phigrid[i,j] - self.phigrid[i,j+1] - self.phigrid[i+1,j])
+                newgrid[i,j] = self.phigrid[i,j] + C*(
+                    2*self.phigrid[i,j] - 
+                    self.flowy[i,j] * self.phigrid[i,j+1] - 
+                    self.flowx[i,j] * self.phigrid[i+1,j])
 
         self.phigrid = newgrid
-
 
 
 def test():
@@ -176,14 +192,14 @@ def test():
     phi_circ.plot_level_set('circle-1-levelset-25.png', 0.25)
 
     # two circles
-    phi_2circ = Phi()
+    phi_2circ = Phi(eye_x=0.5, eye_y=0.5)
     phi_2circ.add_circle(0.5, 0.5, 0.5)
     phi_2circ.add_circle(-0.5, -0.5, 0.25)
     phi_2circ.plot_phi('circle-2-3d.png')
     phi_2circ.plot_level_set('circle-2--levelset.png')
 
     # one rectangle
-    phi_rect = Phi()
+    phi_rect = Phi(eye_x=0, eye_y=-0.75)
     phi_rect.add_rectangle(-0.5, 0.5, -0.75, 0.75)
     phi_rect.plot_phi('rectangle-1-3d.png')
     phi_rect.plot_level_set('rectangle-1--levelset.png')
@@ -206,17 +222,24 @@ def test():
     phi_parab2.plot_phi('ellipse-long-y-3d.png')
     phi_parab2.plot_level_set('ellipse-long-y-levelset.png')
 
+    phit = Phi()
+    phit.add_circle(0, 0.5, -0.1)
+    phit.plot_level_set('test-transport-levelset-0.png')
+    phit.plot_phi('test-transport-surface-0.png')
+    for k in range(11):
+        phit.transport()
+        phit.plot_level_set('test-transport-levelset-{}.png'.format(k))
+        phit.plot_phi('test-transport-surface-{}.png'.format(k))
+
     
 def run_transport(eye_x, eye_y, plotname):
     # parameters for running and saving
-    n_iter = 10
-    savepoints = [1,2,3,4,5,6,7,8,9]
+    n_iter = 1000
+    savepoints = [10,50,100,500,1000]
 
     # initialize phi
     phi = Phi(eye_x=eye_x, eye_y=eye_y)
 
-    # build initial state
-    phi = Phi(eye_x=-0.75, eye_y=0.75)
     # circles
     phi.add_circle(-0.85, 0, 0.05)
     phi.add_circle(-0.25, 0, 0.1)
@@ -242,4 +265,5 @@ if __name__ == '__main__':
     if TEST:
         test()
 
-    run_transport(0, 0, 'PartA')
+    else:
+        run_transport(0, 0, 'PartA')
