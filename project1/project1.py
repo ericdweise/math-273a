@@ -15,6 +15,8 @@ Academic Quarter: Fall 2019
 Author/student: Eric Weise
 """
 
+import numpy as np
+
 
 def read_image(path):
     """
@@ -26,7 +28,28 @@ def read_image(path):
     Returns:
         A Numpy array representation of the file.
     """
-    pass
+
+    img = np.fromfile(path, dtype=float, sep=' ')
+
+    with open(path, 'r') as f:
+        line = f.readline()
+        row = np.fromstring(line.strip(), dtype=float, sep=' ')
+        N = row.shape[0]
+
+    img = np.reshape(img, (-1, N))
+
+    return img
+
+'''
+        line1 = 
+        img = np.fromstring(line1.strip(), dtype=float, sep=' ')
+
+        for line in fin:
+            row = np.fromstring(line.strip(), dtype=float, sep=' ')
+            img = np.append(img, row, 1)
+
+    return img
+'''
 
 
 def save_image(array, path):
