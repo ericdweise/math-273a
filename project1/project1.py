@@ -17,6 +17,7 @@ Author/student: Eric Weise
 
 import numpy as np
 from math import floor, ceil
+import cv2
 
 
 def read_image(path):
@@ -36,7 +37,9 @@ def read_image(path):
 
     img = np.reshape(img, (-1, N))
 
-    return img
+    rotated_img = np.rot90(img)
+
+    return rotated_img
 
 
 def save_image(array, path, save_png=False):
@@ -47,7 +50,13 @@ def save_image(array, path, save_png=False):
         array: A 2D numpy array.
         path: The path where the image should be saved.
     """
-    pass
+    if save_png:
+        a = np.array(array, copy=True)*255
+        cv2.imwrite(path, a)
+        # a = a*255
+        # png.from_array(a, 'L8').save(path)
+    else:
+        print("Save dat file is not implemented")
 
 
 def create_divided_difference_table(array, depth):
@@ -143,16 +152,30 @@ def resample_image(image, n_x, n_y, n_nodes):
     # Resample in x direction (change number of columns)
     for row_idx in range(image.shape[0]):
         row = image[row_idx,:]
-        new_row = eno(row, n_y, n_nodes)
-        for i in range(len(new_row)):
-            int_image[row_idx,i] = new_row[i]
+        new_row = eno(row, n_x, n_nodes)
+        for i in range(new_row.shape[0]):
+            try:
+                int_image[row_idx,i] = new_row[i]
+            except:
+                print('i: {}'.format(i))
+                print('row_idx: {}'.format(row_idx))
+                print('shape matrix: {}'.format(int_image.shape))
+                print('shape row: {}'.format(new_row.shape))
+                raise(Exception(''))
 
     # Resample in y direction (change number of rows)
-    for col_idx in range(image.shape[1]):
-        column = image[:,col_idx]
-        new_column = eno(column, n_x, n_nodes)
-        for j in range(len(new_col)):
-            new_image[j,col_idx] = new_column[j]
+    for col_idx in range(int_image.shape[1]):
+        column = int_image[:,col_idx]
+        new_column = eno(column, n_y, n_nodes)
+        for j in range(new_column.shape[0]):
+            try:
+                new_image[j,col_idx] = new_column[j]
+            except:
+                print('j: {}'.format(j))
+                print('col_idx: {}'.format(col_idx))
+                print('shape matrix: {}'.format(new_image.shape))
+                print('shape col: {}'.format(new_col.shape))
+                raise(Exception(''))
 
     return new_image
 
@@ -170,11 +193,10 @@ def partA():
         n_nodes = 4
     3) save the output image to eric-weise-part-1.dat
     """
-    img = read_image('dolphinorig.dat')
-    resample_image(img, 1000, 1000, 4)
-    save_image(image, 'part-a.dat')
-    save_image(image, 'part-a.png', save_png=True)
-
+    print('=== Running Part A ===')
+    image = read_image('dolphinorig.dat')
+    new_img = resample_image(image, 1000, 1000, 4)
+    save_image(new_img, 'results/part-a.png', save_png=True)
 
 
 def partB():
@@ -187,10 +209,10 @@ def partB():
         n_nodes = 4
     3) save the output image to eric-weise-part-2.dat
     """
-    img = read_image('dolphinorig.dat')
-    resample_image(img, img.shape[1], img.shape[0], 4)
-    save_image(image, 'part-b.dat')
-    save_image(image, 'part-b.png', save_png=True)
+    print('=== Running Part B ===')
+    image = read_image('dolphinorig.dat')
+    new_img = resample_image(image, image.shape[0], image.shape[1], 4)
+    save_image(new_img, 'results/part-b.png', save_png=True)
 
 
 def partC():
@@ -203,13 +225,15 @@ def partC():
         n_nodes = 10
     3) save the output image
     """
-    img = read_image('dolphinorig.dat')
-    resample_image(img, 300, 100, 10)
-    save_image(image, 'part-c.dat')
-    save_image(image, 'part-c.png', save_png=True)
+    print('=== Running Part C ===')
+    image = read_image('dolphinorig.dat')
+    new_img = resample_image(image, 300, 100, 10)
+    save_image(new_img, 'results/part-c.png', save_png=True)
 
 
 if __name__ == '__main__':
+    i = read_image('dolphinorig.dat')
+    save_image(i, 'results/part-0.png', save_png=True)
     partA()
     partB()
     partC()
