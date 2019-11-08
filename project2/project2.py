@@ -272,7 +272,7 @@ def create_origin(eye_x, eye_y):
     phi.add_circle(0.5, 0.5, 0.15)
     # ellipses
     phi.add_ellipse(0.75, 0.1, 0.05, 0.15)
-    phi.add_ellipse(0.25, 0.3, -0.5, 0.1)
+    phi.add_ellipse(0.25, 0.3, -0.75, 0.1)
     # rectangle
     phi.add_rectangle(-0.7, -0.5, -0.5, 0.5)
 
@@ -294,14 +294,51 @@ if __name__ == '__main__':
         transport_recursive(phi, savepoints, plotname)
 
     elif 'run' in sys.argv:
-        savepoints = [i for i in range(0,101,5)]
+        savepoints = [i for i in range(0,131,5)]
 
+        ##############
+        ### PART A ###
+        ##############
         plotname = 'results/part_a'
         phiA = create_origin(0,0)
         phiA.plot_level_set('results/part_a-levelset-0000.png')
         transport_recursive(phiA, savepoints, plotname)
 
+        ##############
+        ### PART B ###
+        ##############
         plotname = 'results/part_b'
-        phiB = create_origin(-0.5,0.75)
+        phiB = create_origin(-0.25,0.75)
         phiB.plot_level_set('results/part_b-levelset-0000.png')
         transport_recursive(phiB, savepoints, plotname)
+
+        ##############
+        ### PART C ###
+        ##############
+        fig = plt.figure()
+        ax = fig.gca()
+
+        seeable = np.maximum(phiA.phigrid, phiB.phigrid)
+        contour0 = plt.contour(phiA.xgrid, phiA.ygrid, phiA.phi0, 0, colors='green')
+        contour = plt.contour(phiA.xgrid, phiA.ygrid, seeable, 0, colors=['blue'])
+
+        # set axis limits
+        ax.set_xlim(phiA.xmin, phiA.xmax)
+        ax.set_ylim(phiA.ymin, phiA.ymax)
+
+        # set axis labels
+        plt.xlabel('X')
+        plt.ylabel('Y')
+
+        # Set axes to be same length
+        plt.gca().set_aspect('equal')
+
+        # plot eye point
+        ax.plot(phiA.eye_x, phiA.eye_y, 'ro')
+        ax.plot(phiB.eye_x, phiB.eye_y, 'ro')
+
+        plt.savefig('results/part_c.png')
+
+        plt.cla()
+        plt.clf()
+        plt.close()
