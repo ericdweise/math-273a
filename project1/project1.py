@@ -38,7 +38,7 @@ def read_image(path):
     return img
 
 
-def save_image(array, path):
+def save_image(array, path, save_png=False):
     """
     Will save a 2D Numpy array to a file.
 
@@ -69,7 +69,14 @@ def eno(array, n_samples, n_nodes):
     Returns:
         A 1D array with length "n_samples".
     """
-    pass
+    x = [float(i)*array.shape[0]/n_samples for i in range(n_samples)]
+    new_array = np.array(shape=n_samples)
+    ddiff_table = create_divided_difference_table(array, n_nodes)
+
+    for i in range(len(xvals)):
+        new_array[i] = interpolate(x[i], array, ddiff_table)
+
+    return new_array
 
 
 def resample_image(image, n_x, n_y, n_nodes):
