@@ -21,14 +21,11 @@ import numpy as np
 def read_image(path):
     """
     Will read in the image and return a numpy array.
-
     Args:
         path: Path to the image file.
-
     Returns:
         A Numpy array representation of the file.
     """
-
     img = np.fromfile(path, dtype=float, sep=' ')
 
     with open(path, 'r') as f:
@@ -39,17 +36,6 @@ def read_image(path):
     img = np.reshape(img, (-1, N))
 
     return img
-
-'''
-        line1 = 
-        img = np.fromstring(line1.strip(), dtype=float, sep=' ')
-
-        for line in fin:
-            row = np.fromstring(line.strip(), dtype=float, sep=' ')
-            img = np.append(img, row, 1)
-
-    return img
-'''
 
 
 def save_image(array, path):
@@ -63,37 +49,58 @@ def save_image(array, path):
     pass
 
 
-def eno(array, n_out, n_nodes):
+def create_divided_difference_table(array, depth):
+    pass
+    
+
+def interpolate(x, array, ddiff):
+    pass
+
+
+def eno(array, n_samples, n_nodes):
     """
     Perform ENO on a 1D array at n_out evenly spaced points. Each point
     interpolated will be found using n_nodes from array to perform the 
     ENO. Assumes Von Neumann boundary conditions.
-
     Args:
         array: A 1D array of values that represent the original data.
         n_out: The number of samples to interpolate. AKA, the length of the returned array.
         n_nodes: The number of original nodes to use in each interpolation.
-
     Returns:
         A 1D array with length "n_samples".
     """
     pass
 
 
-def resample_image(array, n_x, n_y, n_nodes):
+def resample_image(image, n_x, n_y, n_nodes):
     """
     Will perform two iterations of ENO on a 2D array. The first will resample the original array in the "x" direction and the second will resample the array in the "y" direction.
-
     Args:
-        array: A 2D Numpy array representing pixel information of an image.
+        image: A 2D Numpy array representing pixel information of an image.
         n_x: The number of samples in the x direction for the output image.
         n_y: The number of samples in the y direction for the output image.
         n_nodes: The number of original nodes to use in each interpolation.
-
     Returns:
         A 2D Numpy array that is the resampled image.
     """
-    pass
+    int_image = np.zeros(shape=(image.shape[0], n_x))
+    new_image = np.zeros(shape=(n_y, n_x))
+
+    # Resample in x direction (change number of columns)
+    for row_idx in range(image.shape[0]):
+        row = image[row_idx,:]
+        new_row = eno(row, n_y, n_nodes)
+        for i in range(len(new_row)):
+            int_image[row_idx,i] = new_row[i]
+
+    # Resample in y direction (change number of rows)
+    for col_idx in range(image.shape[1]):
+        column = image[:,col_idx]
+        new_column = eno(column, n_x, n_nodes)
+        for j in range(len(new_col)):
+            new_image[j,col_idx] = new_column[j]
+
+    return new_image
 
 
 #######################################################
