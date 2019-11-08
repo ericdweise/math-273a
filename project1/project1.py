@@ -50,7 +50,7 @@ def save_image(array, path, save_png=False):
     pass
 
 
-def find_divided_differences(array, depth):
+def create_divided_difference_table(array, depth):
     table = np.zeros(shape=(array.shape[0], depth))
     
     for i in range(array.shape[0]):
@@ -82,7 +82,7 @@ def interpolate(x, array, n_nodes, ddiffs):
             index = idx_up
             choices.append(index+1)
             D = ddiffs[index-k, k]
-        elif idx_up > array.shape[0]:
+        elif idx_up > array.shape[0] - 1:
             index = idx_dn
             choices.append(index-1)
             D = ddiffs[index, k]
@@ -117,15 +117,13 @@ def eno(array, n_samples, n_nodes):
         A 1D array with length "n_samples".
     """
     x = [float(i)*array.shape[0]/n_samples for i in range(n_samples)]
-    new_array = np.array(shape=n_samples)
+    new_array = np.zeros(shape=n_samples)
     ddiff_table = create_divided_difference_table(array, n_nodes)
 
-    for i in range(len(xvals)):
-        new_array[i] = interpolate(x[i], array, ddiff_table, n_nodes)
+    for i in range(len(x)):
+        new_array[i] = interpolate(x[i], array, n_nodes, ddiff_table)
 
     return new_array
-
-
 
 
 def resample_image(image, n_x, n_y, n_nodes):
