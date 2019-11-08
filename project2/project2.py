@@ -58,8 +58,8 @@ class Phi(object):
                 if x == 0:
                     x[...] = np.inf
 
-        self.flowx = np.divide(self.xgrid, denom)
-        self.flowy = np.divide(self.ygrid, denom)
+        self.flowx = np.divide(self.xgrid - self.eye_x, denom)
+        self.flowy = np.divide(self.ygrid - self.eye_y, denom)
 
 
     def plot_phi(self, path):
@@ -205,7 +205,7 @@ class Phi(object):
 
                 newgrid[j,i] = self.phigrid[j,i] - C*(Dx + Dy)
 
-        self.phigrid = newgrid
+        self.phigrid = np.minimum(newgrid, self.phigrid)
 
 
 def test():
@@ -279,7 +279,6 @@ def create_origin(eye_x, eye_y):
     return phi
 
 
-
 if __name__ == '__main__':
     if 'test' in sys.argv:
         test()
@@ -303,6 +302,6 @@ if __name__ == '__main__':
         transport_recursive(phiA, savepoints, plotname)
 
         plotname = 'results/part_b'
-        phiB = create_origin(-0.75,0.75)
+        phiB = create_origin(-0.5,0.75)
         phiB.plot_level_set('results/part_b-levelset-0000.png')
-        transport_recursive(phiA, savepoints, plotname)
+        transport_recursive(phiB, savepoints, plotname)
