@@ -16,6 +16,7 @@ Author/student: Eric Weise
 """
 
 import numpy as np
+from math import floor, ceil
 
 
 def read_image(path):
@@ -49,12 +50,38 @@ def save_image(array, path, save_png=False):
     pass
 
 
-def create_divided_difference_table(array, depth):
-    pass
+def find_divided_differences(array, depth):
+    table = np.zeros(shape=(array.shape[0], depth))
+    
+    for i in range(array.shape[0]):
+        table[i,0] = array[i]
+
+    for j in range(1, depth):
+        for i in range(array.shape[0]-j):
+            table[i,j] = (table[i+1,j-1] - table[i,j-1])/j
+
+    return table
     
 
-def interpolate(x, array, ddiff):
-    pass
+
+def interpolate(x, array, n_nodes, ddiffs):
+    if round(x) == x:
+        return(array(int(x)))
+
+    interp = 0
+
+    choices = [int(floor(x)), int(ceil(x))]
+    min_idx = max(choices[0] - n_nodes + 1, 0)
+    max_idx = min(choices[1] + n_nodes - 1, array.shape[0])
+    ddiffs = array[min_idx:max_idx+1]
+
+    for _ in range(n_nodes):
+        pass
+        # choose ddiff
+        # add to interp
+
+    ####
+    return interp
 
 
 def eno(array, n_samples, n_nodes):
@@ -77,6 +104,8 @@ def eno(array, n_samples, n_nodes):
         new_array[i] = interpolate(x[i], array, ddiff_table)
 
     return new_array
+
+
 
 
 def resample_image(image, n_x, n_y, n_nodes):
