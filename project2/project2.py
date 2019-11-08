@@ -19,8 +19,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
-
-TEST = True
+import sys
 
 
 class Phi(object):
@@ -45,9 +44,12 @@ class Phi(object):
         # 2D grid to hold x and y values
         self.xgrid, self.ygrid = np.meshgrid(xlist, ylist)
 
-        # 2D grid to hold Phi values
+        # 2D grid to hold current Phi values
         # Initialize with Inf to accommodate min() for union
         self.phigrid = np.full(self.xgrid.shape, np.inf)
+
+        # 2D grid to hold initial Phi values
+        self.phi0 = np.array(self.phigrid, copy=True)
 
         # Set flow field
         denom = np.sqrt((self.xgrid - eye_x)**2 + (self.ygrid - eye_y)**2)
@@ -98,7 +100,8 @@ class Phi(object):
         """
         fig = plt.figure()
         ax = fig.gca()
-        contour = ax.contour(self.xgrid, self.ygrid, self.phigrid, [value,])
+        contour0 = plt.contour(self.xgrid, self.ygrid, self.phi0, [value,], colors='green')
+        contour = plt.contour(self.xgrid, self.ygrid, self.phigrid, [value,], colors=['blue'])
 
         # set axis limits
         ax.set_xlim(self.xmin, self.xmax)
@@ -127,6 +130,7 @@ class Phi(object):
         """
         newgrid = (self.xgrid - x)**2 + (self.ygrid - y)**2 - r**2
         self.phigrid = np.minimum(self.phigrid, newgrid)
+        self.phi0 = np.array(self.phigrid, copy=True)
 
     def add_ellipse(self, x, a, y, b):
         """
@@ -135,6 +139,7 @@ class Phi(object):
         """
         newgrid = ((self.xgrid - x)/a)**2 + ((self.ygrid - y)/b)**2 - 1
         self.phigrid = np.minimum(self.phigrid, newgrid)
+        self.phi0 = np.array(self.phigrid, copy=True)
 
 
     def add_rectangle(self, xmin, xmax, ymin, ymax):
@@ -154,6 +159,7 @@ class Phi(object):
         newgrid = np.maximum(newgrid, newgrid1)
 
         self.phigrid = np.minimum(self.phigrid, newgrid)
+        self.phi0 = np.array(self.phigrid, copy=True)
 
     def transport(self, k=0.01):
         """
@@ -168,16 +174,36 @@ class Phi(object):
 
         C = k/self.grid_step
 
-        # TODO: This is not right!!! 
-        # newgrid = self.phigrid + C*(2*self.phigrid - self.phigrid - self.phigrid)
-        # TODO: Try this instead
         newgrid = np.empty_like(self.phigrid)
-        for i in range(newgrid.shape[0]-1):
-            for j in range(newgrid.shape[1]-1):
-                newgrid[i,j] = self.phigrid[i,j] + C*(
-                    2*self.phigrid[i,j] - 
-                    self.flowy[i,j] * self.phigrid[i,j+1] - 
-                    self.flowx[i,j] * self.phigrid[i+1,j])
+
+        # NOTE: indices are reversed: grid[j,i] is the ith "x" and jth "y" value
+        # X coordinates are indexed by "i"
+        for i in range(newgrid.shape[1]-1):
+            # Y coordinates are indexed by "j"
+            for j in range(newgrid.shape[0]-1):
+
+                # Create upwind values
+                if self.flowx[j,i] > 0:
+                    Dx = (self.phigrid[j,i] - self.phigrid[j,i-1])*self.flowx[j,i]
+                else:
+                    Dx = (self.phigrid[j,i+1] - self.phigrid[j,i])*self.flowx[j,i]
+
+                if self.flowy[j,i] > 0:
+                    Dy = (self.phigrid[j,i] - self.phigrid[j-1,i])*self.flowy[j,i]
+                else:
+                    Dy = (self.phigrid[j+1,i] - self.phigrid[j,i])*self.flowy[j,i]
+
+                # implement non-upwinding scheme
+                # if Dx+Dy < 0: does something weird..
+                #     continue
+
+                # Method 1: widens close to eyepoint
+                # if Dy < 0:
+                #     Dy = 0
+                # if Dx < 0:
+                #     Dx = 0
+
+                newgrid[j,i] = self.phigrid[j,i] - C*(Dx + Dy)
 
         self.phigrid = newgrid
 
@@ -187,56 +213,56 @@ def test():
     # one circle
     phi_circ = Phi()
     phi_circ.add_circle(0,0,0.5)
-    phi_circ.plot_phi('circle-1-3d.png')
-    phi_circ.plot_level_set('circle-1-levelset.png')
-    phi_circ.plot_level_set('circle-1-levelset-25.png', 0.25)
+    phi_circ.plot_phi('test-results/circle-1-3d.png')
+    phi_circ.plot_level_set('test-results/circle-1-levelset.png')
+    phi_circ.plot_level_set('test-results/circle-1-levelset-25.png', 0.25)
 
     # two circles
     phi_2circ = Phi(eye_x=0.5, eye_y=0.5)
     phi_2circ.add_circle(0.5, 0.5, 0.5)
     phi_2circ.add_circle(-0.5, -0.5, 0.25)
-    phi_2circ.plot_phi('circle-2-3d.png')
-    phi_2circ.plot_level_set('circle-2--levelset.png')
+    phi_2circ.plot_phi('test-results/circle-2-3d.png')
+    phi_2circ.plot_level_set('test-results/circle-2-levelset.png')
 
     # one rectangle
     phi_rect = Phi(eye_x=0, eye_y=-0.75)
     phi_rect.add_rectangle(-0.5, 0.5, -0.75, 0.75)
-    phi_rect.plot_phi('rectangle-1-3d.png')
-    phi_rect.plot_level_set('rectangle-1--levelset.png')
+    phi_rect.plot_phi('test-results/rectangle-1-3d.png')
+    phi_rect.plot_level_set('test-results/rectangle-1-levelset.png')
 
     # two rectangles
     phi_2rect = Phi()
     phi_2rect.add_rectangle(-0.75, 0, -0.75, 0)
     phi_2rect.add_rectangle(0, 0.25, 0, 0.5)
-    phi_2rect.plot_phi('rectangle-2-3d.png')
-    phi_2rect.plot_level_set('rectangle-2-levelset.png')
-    phi_2rect.plot_level_set('rectangle-2-levelset-50.png', 0.5)
+    phi_2rect.plot_phi('test-results/rectangle-2-3d.png')
+    phi_2rect.plot_level_set('test-results/rectangle-2-levelset.png')
+    phi_2rect.plot_level_set('test-results/rectangle-2-levelset-50.png', 0.5)
 
     # one ellipse
     phi_parab = Phi()
     phi_parab.add_ellipse(0,2,0,1)
-    phi_parab.plot_phi('ellipse-long-x-3d.png')
-    phi_parab.plot_level_set('ellipse-long-x-levelset.png')
+    phi_parab.plot_phi('test-results/ellipse-long-x-3d.png')
+    phi_parab.plot_level_set('test-results/ellipse-long-x-levelset.png')
     phi_parab2 = Phi()
     phi_parab2.add_ellipse(0.5,1,0,2)
-    phi_parab2.plot_phi('ellipse-long-y-3d.png')
-    phi_parab2.plot_level_set('ellipse-long-y-levelset.png')
+    phi_parab2.plot_phi('test-results/ellipse-long-y-3d.png')
+    phi_parab2.plot_level_set('test-results/ellipse-long-y-levelset.png')
 
-    phit = Phi()
-    phit.add_circle(0, 0.5, -0.1)
-    phit.plot_level_set('test-transport-levelset-0.png')
-    phit.plot_phi('test-transport-surface-0.png')
-    for k in range(11):
-        phit.transport()
-        phit.plot_level_set('test-transport-levelset-{}.png'.format(k))
-        phit.plot_phi('test-transport-surface-{}.png'.format(k))
+    # starting phi for submission
+    phi = create_origin(0,0)
+    phi.plot_level_set('test-results/starting-level-set.png')
 
-    
-def run_transport(eye_x, eye_y, plotname):
-    # parameters for running and saving
-    n_iter = 1000
-    savepoints = [10,50,100,500,1000]
 
+def transport_recursive(phi, savepoints, plotname):
+    n_iter = max(savepoints)
+    for it in range(1, n_iter+1):
+        phi.transport()
+        if it in savepoints:
+            phi.plot_level_set('{}-levelset-{:04d}.png'.format(plotname, it))
+            # phi.plot_phi('{}-surface-{:04d}.png'.format(plotname, it))
+
+
+def create_origin(eye_x, eye_y):
     # initialize phi
     phi = Phi(eye_x=eye_x, eye_y=eye_y)
 
@@ -250,20 +276,33 @@ def run_transport(eye_x, eye_y, plotname):
     # rectangle
     phi.add_rectangle(-0.7, -0.5, -0.5, 0.5)
 
-    # save figures of initial states:
-    phi.plot_level_set('{}-levelset-0.png'.format(plotname))
-    phi.plot_phi('{}-surface-0.png'.format(plotname))
+    return phi
 
-    for it in range(1, n_iter+1):
-        phi.transport()
-        if it in savepoints:
-            phi.plot_level_set('{}-levelset-{}.png'.format(plotname, it))
-            phi.plot_phi('{}-surface-{}.png'.format(plotname, it))
 
 
 if __name__ == '__main__':
-    if TEST:
+    if 'test' in sys.argv:
         test()
 
-    else:
-        run_transport(0, 0, 'PartA')
+    elif 'test-transport' in sys.argv:
+        savepoints = [1,5,6,7,8,9,10,15,20]
+        plotname = 'test-results/transport'
+
+        phi = Phi(eye_x=0, eye_y=0)
+        phi.add_circle(0, 0.5, -0.1)
+        phi.add_circle(0.25, -0.25, -0.2)
+        phi.plot_level_set('test-results/transport-levelset-0000.png')
+        transport_recursive(phi, savepoints, plotname)
+
+    elif 'run' in sys.argv:
+        savepoints = [i for i in range(0,101,5)]
+
+        plotname = 'results/part_a'
+        phiA = create_origin(0,0)
+        phiA.plot_level_set('results/part_a-levelset-0000.png')
+        transport_recursive(phiA, savepoints, plotname)
+
+        plotname = 'results/part_b'
+        phiB = create_origin(-0.75,0.75)
+        phiB.plot_level_set('results/part_b-levelset-0000.png')
+        transport_recursive(phiA, savepoints, plotname)
