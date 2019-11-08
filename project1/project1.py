@@ -101,7 +101,6 @@ def interpolate(x, array, n_nodes, ddiffs):
         # prepare for next iteration
         x_factor = x_factor*(x - index)
 
-    ####
     return interp
 
 
@@ -173,7 +172,11 @@ def partA():
         n_nodes = 4
     3) save the output image to eric-weise-part-1.dat
     """
-    print('Part A has not yet been implemented')
+    img = read_image('dolphinorig.dat')
+    resample_image(img, 1000, 1000, 4)
+    save_image(image, 'part-a.dat')
+    save_image(image, 'part-a.png', save_png=True)
+
 
 
 def partB():
@@ -186,7 +189,10 @@ def partB():
         n_nodes = 4
     3) save the output image to eric-weise-part-2.dat
     """
-    print('Part B has not yet been implemented')
+    img = read_image('dolphinorig.dat')
+    resample_image(img, img.shape[1], img.shape[0], 4)
+    save_image(image, 'part-b.dat')
+    save_image(image, 'part-b.png', save_png=True)
 
 
 def partC():
@@ -197,9 +203,12 @@ def partC():
         n_x = 300
         n_y = 100
         n_nodes = 10
-    3) save the output image to eric-weise-part-3.dat
+    3) save the output image
     """
-    print('Part C has not yet been implemented')
+    img = read_image('dolphinorig.dat')
+    resample_image(img, 300, 100, 10)
+    save_image(image, 'part-c.dat')
+    save_image(image, 'part-c.png', save_png=True)
 
 
 if __name__ == '__main__':
