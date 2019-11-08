@@ -66,19 +66,40 @@ def find_divided_differences(array, depth):
 
 def interpolate(x, array, n_nodes, ddiffs):
     if round(x) == x:
-        return(array(int(x)))
+        return(array[int(x)])
 
     interp = 0
+    x_factor = 1
 
     choices = [int(floor(x)), int(ceil(x))]
-    min_idx = max(choices[0] - n_nodes + 1, 0)
-    max_idx = min(choices[1] + n_nodes - 1, array.shape[0])
-    ddiffs = array[min_idx:max_idx+1]
 
-    for _ in range(n_nodes):
-        pass
-        # choose ddiff
+    for k in range(n_nodes):
+        idx_dn = min(choices)
+        idx_up = max(choices)
+
+        # choose index to use
+        if idx_dn < 0:
+            index = idx_up
+            choices.append(index+1)
+            D = ddiffs[index-k, k]
+        elif idx_up > array.shape[0]:
+            index = idx_dn
+            choices.append(index-1)
+            D = ddiffs[index, k]
+        elif abs(ddiffs[idx_dn ,k]) < abs(ddiffs[idx_up-k, k]):
+            index = idx_dn
+            choices.append(index-1)
+            D = ddiffs[index, k]
+        else:
+            index = idx_up
+            choices.append(index+1)
+            D = ddiffs[index-k, k]
+
         # add to interp
+        interp = interp + D*x_factor
+
+        # prepare for next iteration
+        x_factor = x_factor*(x - index)
 
     ####
     return interp
@@ -101,7 +122,7 @@ def eno(array, n_samples, n_nodes):
     ddiff_table = create_divided_difference_table(array, n_nodes)
 
     for i in range(len(xvals)):
-        new_array[i] = interpolate(x[i], array, ddiff_table)
+        new_array[i] = interpolate(x[i], array, ddiff_table, n_nodes)
 
     return new_array
 
