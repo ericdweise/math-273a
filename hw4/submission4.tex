@@ -1,0 +1,59 @@
+\documentclass{article}
+
+% PACKAGES
+\usepackage[margin=0.75in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{subcaption}
+
+% TITLE
+\title{Math 273A - Homework 4}
+\author{Eric Weise}
+
+\begin{document}
+\maketitle
+
+\section*{Problem 1}
+First, binomial expansion:
+\begin{align*}
+    (a-b)^k = \sum_{m=0}^{k} \binom{k}{m}a^m(-b)^{k-m}
+\end{align*}
+Then:
+\begin{align*}
+    \sum_{k=0}^{n} a_k (z - z_0)^k
+    &= \sum_{k=0}^{n} a_k \sum_{m=0}^{k} \binom{k}{m} (-z_0)^{k-m} z^m \\
+    &= \sum_{k=0}^{n} \sum_{m=0}^{k} \bigg( a_k \binom{k}{m} (-z_0)^{k-m} z^m \bigg) \\
+    &= \sum_{0 \leq m \leq k \leq n}\bigg(  a_k \binom{k}{m} (-z_0)^{k-m} z^m \bigg) \\
+    &= \sum_{m=0}^{n} \sum_{k=m}^{n} \bigg( a_k \binom{k}{m} (-z_0)^{k-m} z^m \bigg) \\
+    &= \sum_{m=0}^{n} \bigg( \sum_{k=m}^{n} a_k \binom{k}{m} (-z_0)^{k-m} \bigg) z^m
+\end{align*}
+
+\section*{Problem 2}
+\subsection*{Part A}
+\begin{align*}
+    log(z - z_0)
+    &= log(z(1 - \frac{z_0}{z})) \\
+    &= log(z) + log(1 - \frac{z_0}{z}) \\
+    &= log(z) - \sum_{n=1}^{\infty}\frac{1}{k}\bigg(\frac{z_0}{z}\bigg)^k
+\end{align*}
+We can use the power series expansion:
+\[ log(1-\omega) = -\sum_{n=0}^{\infty}\frac{\omega^n}{n} \] 
+since $|z_0|<R<|z| \implies |\frac{z_0}{z}| < 1$.
+
+\subsection*{Part B}
+\begin{align*}
+    \Big| \sum_{k=p+1}^{\infty} \frac{1}{k} \big(\frac{z_0}{z} \big)^k \Big|
+    & \leq \sum_{k=p+1}^{\infty} \bigg| \frac{1}{k} \big(\frac{z_0}{z} \big)^k \bigg| \\
+    &= \sum_{k=p+1}^{\infty} \frac{1}{k} \bigg| \frac{z_0}{z} \bigg|^k \\
+    &\leq \sum_{k=p+1}^{\infty} \frac{1}{p+1} \bigg| \frac{z_0}{z} \bigg|^k && \text{Since $k \leq p+1$} \\
+    &= \frac{1}{p+1} \sum_{k=p+1}^{\infty} \bigg| \frac{z_0}{z} \bigg|^k \\
+    &\leq \frac{1}{p+1} \sum_{k=p+1}^{\infty} \bigg| \frac{R}{z} \bigg|^k && \text{Since $|z_0|<R$} \\
+    &= \frac{1}{p+1} \sum_{k=p+1}^{\infty}d^k \\
+    &= \frac{1}{p+1} \sum_{k=p+1}^{\infty}d^{p+1} d^{k-p-1} \\
+    &= \frac{d^{p+1}}{p+1} \sum_{k=p+1}^{\infty} d^{k-p-1} \\
+    &= \frac{d^{p+1}}{p+1} \sum_{j=0}^{\infty} d^k && \text{j = k-p-1}\\
+    &= \frac{d^{p+1}}{(p+1)(1-d)} && \text{Using the formula for geometric series, since $-1<0<d<1$}
+\end{align*}
+
+\end{document}
