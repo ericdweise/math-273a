@@ -69,8 +69,8 @@ def add_ghost_fluid_point():
     pass
 
 
-def compute_residual():
-    pass
+def compute_residual(A, b, x):
+    return np.linalg.norm(b-np.matmul(A,x), 2)/np.linalg.norm(b, 2)
 
 
 if __name__ == '__main__':
