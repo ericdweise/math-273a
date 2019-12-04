@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def congugate_gradient(A, b, residual_thresh):
+def conjugate_gradient(A, b, residual_thresh):
     basis = standard_basis(A.shape[0])
     conjugate_basis = []
     x = np.zeros(A.shape[0])
