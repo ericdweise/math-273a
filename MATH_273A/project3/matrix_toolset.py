@@ -1,6 +1,15 @@
 import numpy as np
 
 
+def is_symmetric(A):
+    for i in range(1, A.shape[0]):
+        for j in range(i, A.shape[1]):
+            if i != j:
+                if A[i,j] != A[j,i]:
+                    return False
+    return True
+
+
 def is_sym_pos_def(A):
     """Test if a matrix A is symmetric positive definite"""
     for i in range(A.shape[0]):
