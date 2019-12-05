@@ -79,7 +79,7 @@ class Ellipse(object):
         inside2 = self.inside(x2, y2)
         assert(inside1 != inside2)
 
-        x_step = x1-x2
+        x_step = x2-x1
         y_step = y2-y1
         DIST = sqrt((x1-x2)**2 + (y1-y2)**2)
 
@@ -87,6 +87,7 @@ class Ellipse(object):
 
             x_step = x_step/2.0
             y_step = y_step/2.0
+            inside2 = self.inside(x2, y2)
 
             if inside2==inside1:
                 # move away from x1,y1
