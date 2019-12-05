@@ -17,41 +17,6 @@ from conjugate_gradient import conjugate_gradient
 np.set_printoptions(threshold=sys.maxsize)
 
 
-class AllInsideBoundary(object):
-    def inside(self, x, y):
-        return True
-
-
-class AllOutsideBoundary(object):
-    def inside(self,x,y):
-        return False
-
-
-class HorizontalLineBoundary(object):
-    def __init__(self, y):
-        self.y = y
-
-    def inside(self, x, y):
-        if y > self.y:
-            return True
-        return False
-
-    def find_alpha(self, x1, y1, x2, y2):
-        return abs(self.y-y1)
-
-
-class DiagonalLineBoundary(object):
-    def __init__(self, theta):
-        self.theta = theta
-
-    def inside(self, x, y):
-        if acos(y/x) > theta:
-            return True
-        return False
-
-    def alpha(self, x1, y1, x2, y2):
-        return 
-
 class Ellipse(object):
 
     def __init__(self, xcent, a, ycent, b):
