@@ -185,15 +185,15 @@ def compute_residual(A, b, x):
 if __name__ == '__main__':
 
     # distance between grid points
-    GRIDSTEP = 0.05
+    GRIDSTEP = 0.02
 
     # Residual cutoff point
     cutoff = 10**(-7)
 
     # DEFINE ELLIPSE
     XCENTER = 0.
-    YCENTER = 0.
-    ELLIPSE_A = 0.1
+    YCENTER = 0.1
+    ELLIPSE_A = 0.5
     ELLIPSE_B = 0.25
     ellipse = Ellipse(XCENTER, ELLIPSE_A, YCENTER, ELLIPSE_B)
 
