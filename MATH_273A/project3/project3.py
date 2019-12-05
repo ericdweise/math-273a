@@ -99,8 +99,7 @@ class Ellipse(object):
                 y2 = y2 - y_step
 
         alpha = sqrt((x2-x1)**2 + (y2-y1)**2)/DIST
-        if alpha > 1:
-            print(f'Problem, alpha is greater than 1: ({x1},{y1}), ({x2},{y2})')
+        assert(alpha<1), f'alpha is greater than 1: ({x1},{y1}), ({x2},{y2})'
 
         return alpha
 
