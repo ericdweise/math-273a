@@ -1,6 +1,13 @@
 import numpy as np
 
 
+def create_mesh(gridstep=0.01, xmin=-1, xmax=1, ymin=-1, ymax=1):
+    xlist = np.arange(xmin, xmax + 0.01*gridstep, gridstep)
+    ylist = np.arange(ymin, ymax + 0.01*gridstep, gridstep)
+    xgrid, ygrid = np.meshgrid(xlist, ylist)
+    return xgrid, ygrid
+
+
 def is_symmetric(A):
     for i in range(1, A.shape[0]):
         for j in range(i, A.shape[1]):
@@ -20,7 +27,6 @@ def is_sym_pos_def(A):
             if i != j:
                 if A[i,j] != A[j,i]:
                     return False
-
     return True
 
 

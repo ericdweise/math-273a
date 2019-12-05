@@ -6,6 +6,7 @@ from math import exp
 from math import pi
 from math import sin
 from math import sqrt
+from matrix_toolset import create_mesh
 from matrix_toolset import iter_matrix
 from matrix_toolset import is_sym_pos_def
 from matrix_toolset import is_symmetric
@@ -14,13 +15,6 @@ from conjugate_gradient import conjugate_gradient
 
 
 np.set_printoptions(threshold=sys.maxsize)
-
-
-def create_mesh(gridstep=0.01, xmin=-1, xmax=1, ymin=-1, ymax=1):
-    xlist = np.arange(xmin, xmax + 0.01*gridstep, gridstep)
-    ylist = np.arange(ymin, ymax + 0.01*gridstep, gridstep)
-    xgrid, ygrid = np.meshgrid(xlist, ylist)
-    return xgrid, ygrid
 
 
 class AllInsideBoundary(object):
@@ -205,8 +199,8 @@ def build_soe_matrix(omega, xgrid, ygrid, gridstep):
         row = (i*xgrid.shape[0])+j # Row index for A, b
         A[row,:] = 0 # Remove dependence of other points on this point
         A[:,row] = 0
-        A[row,row] = 1 # Direct dependence on 
-        b[row] = 0 # Value of u at boundary is 0
+        A[row,row] = -1 # Direct dependence on 
+        b[row] = 0 # Negative u value at boundary
 
     return A, b
 
@@ -243,9 +237,9 @@ if __name__ == '__main__':
 
     # CREATE MATRIX FOR SYSTEM OF EQUATIONS
     A, b = build_soe_matrix(ellipse, xgrid, ygrid, GRIDSTEP)
-    with open('project_3_results/A.txt', 'w') as f:
+    with open('results/project3/A.txt', 'w') as f:
         A.tofile(f)
-    with open('project_3_results/b.txt', 'w') as f:
+    with open('results/project3/b.txt', 'w') as f:
         b.tofile(f)
 
     assert(is_symmetric(A))
@@ -254,15 +248,21 @@ if __name__ == '__main__':
     A_neg = -1*A
     b_neg = -1*b
     # assert(is_sym_pos_def(A))
+    print('Find Incomplete Cholesky Factor, R')
     R = incomplete_cholesky_factorization(A_neg)
+    print('Finding R inverse')
     R_inverse = np.linalg.inv(R)
+    print('Finding Inverse of Transpose of R')
     R_transpose_inverse = np.linalg.inv(np.matrix.transpose(R))
 
     # Precondition Matrix:
+    print('Preconditioning Matrix')
     A_hat = np.matmul(np.matmul(R_transpose_inverse, A_neg), R_inverse)
     b_hat = np.matmul(R_transpose_inverse, b_neg)
+
+    print('Performing conjugate gradient')
     x_hat = conjugate_gradient(A_hat, b_hat, cutoff)
 
     x = -1*np.matmul(R_inverse, x_hat)
-    with open('project_3_results/x.txt', 'w') as f:
+    with open('results/project3/x.txt', 'w') as f:
         x.tofile(f)
