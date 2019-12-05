@@ -12,6 +12,8 @@ from matrix_toolset import create_mesh
 from matrix_toolset import iter_matrix
 from matrix_toolset import is_sym_pos_def
 from matrix_toolset import is_symmetric
+from plot_tools import plot_heatmap
+from plot_tools import plot_surface
 
 from cholesky_factorization import incomplete_cholesky_factorization
 
@@ -170,9 +172,9 @@ if __name__ == '__main__':
 
     # CREATE MATRIX FOR SYSTEM OF EQUATIONS
     A, b = build_soe_matrix(ellipse, xgrid, ygrid, GRIDSTEP)
-    with open('results/project3/A.txt', 'w') as f:
+    with open('results/project3/A.np', 'w') as f:
         A.tofile(f)
-    with open('results/project3/b.txt', 'w') as f:
+    with open('results/project3/b.np', 'w') as f:
         b.tofile(f)
 
     assert(is_symmetric(A))
@@ -197,11 +199,14 @@ if __name__ == '__main__':
     x_hat = conjugate_gradient(A_hat, b_hat, cutoff)
 
     x = -1*np.matmul(R_inverse, x_hat)
-    with open('results/project3/x.txt', 'w') as f:
+    with open('results/project3/x.np', 'w') as f:
         x.tofile(f)
 
     u = np.zeros(xgrid.shape)
-    for k in x.shape[0]:
-        i = k - j*xgrid.shape[0]
-        j = k % xgrid.shape[0]
-        u[i,j] = 
+    for k in range(x.shape[0]):
+        i = k % xgrid.shape[0]
+        j = k // xgrid.shape[0]
+        u[i,j] = x[k]
+    
+    plot_heatmap(xgrid, ygrid, u, 'results/project3/heatmap.png')
+    plot_surface(xgrid, ygrid, u, 'results/project3/surface.png')
