@@ -1,16 +1,20 @@
 import numpy as np
 import sys
+
 from math import acos
 from math import cos
 from math import exp
 from math import pi
 from math import sin
 from math import sqrt
+
 from matrix_toolset import create_mesh
 from matrix_toolset import iter_matrix
 from matrix_toolset import is_sym_pos_def
 from matrix_toolset import is_symmetric
+
 from cholesky_factorization import incomplete_cholesky_factorization
+
 from conjugate_gradient import conjugate_gradient
 
 
@@ -61,30 +65,6 @@ class Ellipse(object):
         assert(alpha<1), f'alpha is greater than 1: ({x1},{y1}), ({x2},{y2})'
 
         return alpha
-
-
-def define_regions(xcent, a, ycent, b):
-    """Create a function that defines the interior of an ellipse"""
-
-    def func(x,y):
-        """Given a point returns what region the point is in:
-        OMEGA: The point is in the ellipse interior
-        dOMEGA: The point is on the edge of the ellipse
-        D: The point is outside of the ellipse but not on dD
-        dD: The point is on the boundary of the computational domain
-        """
-        if (x==-1) or (x==1) or (y==-1) or (y==-1):
-            return 'dD'
-
-        v = ((x-xcent)/a)**2 + ((y-ycent)/b)**2
-        if v < 1:
-            return 'OMEGA'
-        if v == 1:
-            return 'dOMEGA'
-
-        return 'D'
-
-    return(func)
 
 
 def func_f(x,y):
@@ -170,22 +150,10 @@ def build_soe_matrix(omega, xgrid, ygrid, gridstep):
     return A, b
 
 
-def ghost_fluid_value(u_xy, x, y, alpha, u_interface):
-    """
-    alpha: float value in range (-1,1)
-    u_xy, value of u
-    """
-    pass
-
-
-def compute_residual(A, b, x):
-    return np.linalg.norm(b-np.matmul(A,x), 2)/np.linalg.norm(b, 2)
-
-
 if __name__ == '__main__':
 
     # distance between grid points
-    GRIDSTEP = 0.02
+    GRIDSTEP = 0.05
 
     # Residual cutoff point
     cutoff = 10**(-7)
@@ -231,3 +199,9 @@ if __name__ == '__main__':
     x = -1*np.matmul(R_inverse, x_hat)
     with open('results/project3/x.txt', 'w') as f:
         x.tofile(f)
+
+    u = np.zeros(xgrid.shape)
+    for k in x.shape[0]:
+        i = k - j*xgrid.shape[0]
+        j = k % xgrid.shape[0]
+        u[i,j] = 
