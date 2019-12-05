@@ -5,14 +5,13 @@ VERBOSE = True
 
 def conjugate_gradient(A, b, threshold):
     RESIDUAL_CHECK = 20
-    basis = standard_basis(A.shape[0])
     conjugate_basis = []
     x = np.zeros(A.shape[0])
 
     N = A.shape[0]
     n = 0
 
-    for basis_vector in basis:
+    for basis_vector in standard_basis(A.shape[0]):
         n += 1
         p = find_anti_projection(A, basis_vector, conjugate_basis)
         conjugate_basis.append(p)
@@ -34,8 +33,12 @@ def compute_alpha(A, b, p):
     return np.matmul(p, b) / inner_product(A, p, p)
 
 
-def standard_basis(n):
-    return [np.eye(n)[i] for i in range(n)]
+def standard_basis(N):
+    v = np.zeros((N,))
+    for n in range(N):
+        v[n] = 1
+        yield v
+        v[n] = 0
 
 
 def inner_product(A, vleft, vright):

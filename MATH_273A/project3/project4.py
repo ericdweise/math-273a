@@ -25,7 +25,7 @@ def particle(j):
 
 
 def direct_sum_contribution(x,y,xq,yq,q):
-    return q*log(sqrt((x-xq)**2 + (y-yq)**2))
+    return -1*q*log(sqrt((x-xq)**2 + (y-yq)**2))
 
 
 if __name__ == '__main__':
