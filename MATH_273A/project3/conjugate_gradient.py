@@ -1,10 +1,15 @@
 import numpy as np
+from scipy import sparse
 
 VERBOSE = True
 
 
 def conjugate_gradient(A, b, threshold):
     RESIDUAL_CHECK = 20
+
+    # if not sparse.issparse(A):
+    #     A = sparse.csr_matrix(A)
+
     conjugate_basis = []
     x = np.zeros(A.shape[0])
 
@@ -26,7 +31,7 @@ def conjugate_gradient(A, b, threshold):
             if residual < threshold:
                 break
 
-    return x
+    return x  # numpy.ndarray
 
 
 def compute_alpha(A, b, p):
@@ -42,12 +47,20 @@ def standard_basis(N):
 
 
 def inner_product(A, vleft, vright):
-    return np.matmul(vleft, np.matmul(A, vright))
+    if sparse.issparse(A):
+        return np.matmul(vleft, A.dot(vright))
+    elif isinstance(A, np.ndarray):
+        return np.matmul(vleft, np.matmul(A, vright))
+    raise Exception(f'Unsupported matrix format {type(A)}')
 
 
 def find_residual(A, b, x):
     ORDER=2
-    return np.linalg.norm(b - np.matmul(A,x), ORDER)/np.linalg.norm(b, ORDER)
+    if sparse.issparse(A):
+        return np.linalg.norm(b - A.dot(x), ORDER)/np.linalg.norm(b, ORDER)
+    elif isinstance(A, np.ndarray):
+        return np.linalg.norm(b - np.matmul(A,x), ORDER)/np.linalg.norm(b, ORDER)
+    raise Exception(f'Unsupported matrix format {type(A)}')
 
 
 def find_projection(A, v1, v2):

@@ -155,15 +155,15 @@ def build_soe_matrix(omega, xgrid, ygrid, gridstep):
 if __name__ == '__main__':
 
     # distance between grid points
-    GRIDSTEP = 0.05
+    GRIDSTEP = 0.1
 
     # Residual cutoff point
     cutoff = 10**(-7)
 
     # DEFINE ELLIPSE
     XCENTER = 0.
-    YCENTER = 0.1
-    ELLIPSE_A = 0.5
+    YCENTER = 0.
+    ELLIPSE_A = 0.25
     ELLIPSE_B = 0.25
     ellipse = Ellipse(XCENTER, ELLIPSE_A, YCENTER, ELLIPSE_B)
 
@@ -198,7 +198,7 @@ if __name__ == '__main__':
     print('Performing conjugate gradient')
     x_hat = conjugate_gradient(A_hat, b_hat, cutoff)
 
-    x = -1*np.matmul(R_inverse, x_hat)
+    x = np.matmul(R_inverse, x_hat)
     with open('results/project3/x.np', 'w') as f:
         x.tofile(f)
 
