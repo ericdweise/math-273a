@@ -172,7 +172,7 @@ def build_soe_matrix(omega, xgrid, ygrid, gridstep):
 if __name__ == '__main__':
 
     # distance between grid points
-    GRIDSTEP = 0.05
+    GRIDSTEP = 0.02
 
     # Residual cutoff point
     cutoff = 10**(-7)
@@ -181,7 +181,7 @@ if __name__ == '__main__':
     XCENTER = 0.15
     YCENTER = 0
     ELLIPSE_A = 0.65
-    ELLIPSE_B = 0.33
+    ELLIPSE_B = 0.5
     ellipse = Ellipse(XCENTER, ELLIPSE_A, YCENTER, ELLIPSE_B)
 
     # Define grids
