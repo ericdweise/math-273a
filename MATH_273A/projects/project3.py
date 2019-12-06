@@ -172,7 +172,7 @@ def build_soe_matrix(omega, xgrid, ygrid, gridstep):
 if __name__ == '__main__':
 
     # distance between grid points
-    GRIDSTEP = 0.05
+    GRIDSTEP = 0.02
 
     # Residual cutoff point
     cutoff = 10**(-7)
@@ -223,7 +223,7 @@ if __name__ == '__main__':
 
     # Perform Conjugate Gradient
     print('Performing conjugate gradient')
-    x_hat = conjugate_gradient(A_hat, b_hat, cutoff, None)
+    x_hat = conjugate_gradient(A_hat, b_hat, x_guess)
 
     x = np.matmul(R_inverse, x_hat)
     with open('results/project3/x.np', 'w') as f:
