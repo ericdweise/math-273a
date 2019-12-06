@@ -34,3 +34,11 @@ def iter_matrix(A):
     for row in range(A.shape[0]):
         for col in range(A.shape[1]):
             yield row, col
+
+
+def index_vec_to_mat(idx, mat_width):
+    return idx // mat_width, idx % mat_width
+
+
+def index_mat_to_vec(row, col, mat_width):
+    return row*mat_width + col

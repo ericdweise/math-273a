@@ -12,6 +12,9 @@ from matrix_toolset import create_mesh
 from matrix_toolset import iter_matrix
 from matrix_toolset import is_sym_pos_def
 from matrix_toolset import is_symmetric
+from matrix_toolset import index_mat_to_vec
+from matrix_toolset import index_vec_to_mat
+
 from plot_tools import plot_heatmap
 from plot_tools import plot_surface
 
@@ -77,7 +80,7 @@ class Ellipse(object):
             y = ygrid[i,j]
 
             if not self.inside(x,y):
-                v_idx = j*xgrid.shape[0]+i
+                v_idx = index_mat_to_vec(i,j,xgrid.shape[1])
                 guess[v_idx] = 2*(1-abs(x))*(1-abs(y))
 
         return guess
@@ -110,7 +113,7 @@ def build_soe_matrix(omega, xgrid, ygrid, gridstep):
 
         x_ij = xgrid[i,j]
         y_ij = ygrid[i,j]
-        row = (i*xgrid.shape[0])+j # Row index for A, b
+        row = index_mat_to_vec(i,j,xgrid.shape[1]) # Row index for A, b
 
         # Points not on boundary of computational domain
         inside_ij = omega.inside(x_ij,y_ij)
@@ -128,7 +131,7 @@ def build_soe_matrix(omega, xgrid, ygrid, gridstep):
 
         # Add neighbor dependencies
         for (k,l) in [(i+1,j),(i,j+1),(i-1,j),(i,j-1)]:
-            col = (k*xgrid.shape[0])+l # Column index for A
+            col = index_mat_to_vec(k,l,xgrid.shape[1]) # Column index for A
             x_kl = xgrid[k,l]
             y_kl = ygrid[k,l]
             inside_kl = omega.inside(x_kl,y_kl)
@@ -157,7 +160,7 @@ def build_soe_matrix(omega, xgrid, ygrid, gridstep):
     bdy.extend([(i, xgrid.shape[1]-1) for i in range(xgrid.shape[0])])
 
     for i,j in bdy:
-        row = (i*xgrid.shape[0])+j # Row index for A, b
+        row = index_mat_to_vec(i,j,xgrid.shape[1]) # Row index for A, b
         A[row,:] = 0 # Remove dependence of other points on this point
         A[:,row] = 0
         A[row,row] = -1 # Direct dependence on 
@@ -176,13 +179,13 @@ if __name__ == '__main__':
 
     # DEFINE ELLIPSE
     XCENTER = 0.15
-    YCENTER = 0.
+    YCENTER = 0
     ELLIPSE_A = 0.65
     ELLIPSE_B = 0.33
     ellipse = Ellipse(XCENTER, ELLIPSE_A, YCENTER, ELLIPSE_B)
 
     # Define grids
-    xgrid, ygrid = create_mesh(gridstep=GRIDSTEP )
+    xgrid, ygrid = create_mesh(gridstep=GRIDSTEP)
 
     # CREATE MATRIX FOR SYSTEM OF EQUATIONS
     A, b = build_soe_matrix(ellipse, xgrid, ygrid, GRIDSTEP)
@@ -213,15 +216,14 @@ if __name__ == '__main__':
     x_guess = ellipse.create_guess_vector(xgrid, ygrid)
     guess_surface = np.zeros(xgrid.shape)
     for k in range(x_guess.shape[0]):
-        i = k % xgrid.shape[0]
-        j = k // xgrid.shape[0]
+        i,j = index_vec_to_mat(k, xgrid.shape[1])
         guess_surface[i,j] = x_guess[k]
     plot_heatmap(xgrid, ygrid, guess_surface, 'results/project3/heatmap-guess.png')
     plot_surface(xgrid, ygrid, guess_surface, 'results/project3/surface-guess.png')
 
     # Perform Conjugate Gradient
     print('Performing conjugate gradient')
-    x_hat = conjugate_gradient(A_hat, b_hat, cutoff, x_guess)
+    x_hat = conjugate_gradient(A_hat, b_hat, cutoff, None)
 
     x = np.matmul(R_inverse, x_hat)
     with open('results/project3/x.np', 'w') as f:
@@ -229,8 +231,7 @@ if __name__ == '__main__':
 
     u = np.zeros(xgrid.shape)
     for k in range(x.shape[0]):
-        i = k % xgrid.shape[0]
-        j = k // xgrid.shape[0]
+        i,j = index_vec_to_mat(k, xgrid.shape[1])
         u[i,j] = x[k]
     
     plot_heatmap(xgrid, ygrid, u, 'results/project3/heatmap.png')
