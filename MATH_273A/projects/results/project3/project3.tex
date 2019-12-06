@@ -1,0 +1,42 @@
+\documentclass{article}
+
+% PACKAGES
+\usepackage[margin=0.75in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+
+% TITLE
+\title{Math 273A - Project 3}
+\author{Eric Weise - A09642187}
+
+\begin{document}
+\maketitle
+
+\section*{Conjugate Gradient}
+
+My code is hosted at GitHub:\\
+{\it https://github.com/ericdweise/math-273a/tree/master/MATH\_273A/projects}
+
+\subsection*{To run:}
+\begin{verbatim}$ python3 project3.py\end{verbatim}
+
+\subsection*{Note:}
+My gradient descent method would have taken weeks (literaly 2.6 weeks) to compute the solution with a gridstep of 0.2. I could have used another library but I wanted to code it up myself. The solution I provide here has a gridstep value of 0.05.
+
+\begin{figure}[H]
+    \caption{Surface plot of the final solution.}
+    \centering
+        \includegraphics[width=0.5\textwidth]{step-05-surface.png}
+\end{figure}
+
+\begin{figure}[H]
+    \caption{Heatmap of the final surface.}
+    \centering
+        \includegraphics[width=0.5\textwidth]{step-05-heatmap.png}
+\end{figure}
+
+
+\end{document}
