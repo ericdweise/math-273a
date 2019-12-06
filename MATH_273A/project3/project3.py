@@ -149,7 +149,7 @@ def build_soe_matrix(omega, xgrid, ygrid, gridstep):
 
                 alpha = omega.find_alpha(x_ij, y_ij, x_kl, y_kl)
 
-                A[row,row] -= gridstep**(-2)/alpha
+                A[row,row] += (1-1/alpha)/gridstep/gridstep
                 b[row] -= boundary_value*gridstep**(-2)/alpha
 
     # Grid Points on BOUNDARY
