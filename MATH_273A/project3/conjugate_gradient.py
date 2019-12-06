@@ -6,18 +6,16 @@ VERBOSE = True
 
 def conjugate_gradient(A, b, threshold):
     RESIDUAL_CHECK = 20
-
-    # if not sparse.issparse(A):
-    #     A = sparse.csr_matrix(A)
+    N = A.shape[0]
 
     conjugate_basis = []
-    x = np.zeros(A.shape[0])
+    x = np.zeros(N)
 
-    N = A.shape[0]
-    n = 0
 
-    for basis_vector in standard_basis(A.shape[0]):
-        n += 1
+    for n in range(N):
+        basis_vector = np.zeros(N)
+        basis_vector[n] = 1
+
         p = find_anti_projection(A, basis_vector, conjugate_basis)
         conjugate_basis.append(p)
 
@@ -31,19 +29,11 @@ def conjugate_gradient(A, b, threshold):
             if residual < threshold:
                 break
 
-    return x  # numpy.ndarray
+    return x
 
 
 def compute_alpha(A, b, p):
     return np.matmul(p, b) / inner_product(A, p, p)
-
-
-def standard_basis(N):
-    v = np.zeros((N,))
-    for n in range(N):
-        v[n] = 1
-        yield v
-        v[n] = 0
 
 
 def inner_product(A, vleft, vright):
