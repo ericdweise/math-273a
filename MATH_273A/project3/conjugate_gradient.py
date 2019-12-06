@@ -4,13 +4,13 @@ from scipy import sparse
 VERBOSE = True
 
 
-def conjugate_gradient(A, b, threshold):
+def conjugate_gradient(A, b, threshold, x=None):
     RESIDUAL_CHECK = 20
     N = A.shape[0]
 
     conjugate_basis = []
-    x = np.zeros(N)
-
+    if not isinstance(x, np.ndarray):
+        x = np.zeros(N)
 
     for n in range(N):
         basis_vector = np.zeros(N)

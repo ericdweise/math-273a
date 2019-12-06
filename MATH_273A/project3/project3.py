@@ -69,6 +69,20 @@ class Ellipse(object):
         return alpha
 
 
+    def create_guess_vector(self, xgrid, ygrid):
+        """Returns a vector with 2's inside ellipse, 0.5 outside"""
+        guess = 2*np.ones(xgrid.shape[0]*xgrid.shape[1])
+        for i,j in iter_matrix(xgrid):
+            x = xgrid[i,j]
+            y = ygrid[i,j]
+
+            if not self.inside(x,y):
+                v_idx = j*xgrid.shape[0]+i
+                guess[v_idx] = 2*(1-abs(x))*(1-abs(y))
+
+        return guess
+
+
 def func_f(x,y):
     """Apply function f to a point"""
     return(4*exp(y)*sin(pi*x))
@@ -155,16 +169,16 @@ def build_soe_matrix(omega, xgrid, ygrid, gridstep):
 if __name__ == '__main__':
 
     # distance between grid points
-    GRIDSTEP = 0.1
+    GRIDSTEP = 0.05
 
     # Residual cutoff point
     cutoff = 10**(-7)
 
     # DEFINE ELLIPSE
-    XCENTER = 0.
+    XCENTER = 0.15
     YCENTER = 0.
-    ELLIPSE_A = 0.25
-    ELLIPSE_B = 0.25
+    ELLIPSE_A = 0.65
+    ELLIPSE_B = 0.33
     ellipse = Ellipse(XCENTER, ELLIPSE_A, YCENTER, ELLIPSE_B)
 
     # Define grids
@@ -180,11 +194,11 @@ if __name__ == '__main__':
     assert(is_symmetric(A))
 
     # Find Incomplete Cholesky Factorization
-    A_neg = -1*A
-    b_neg = -1*b
+    A = -1*A
+    b = -1*b
     # assert(is_sym_pos_def(A))
     print('Find Incomplete Cholesky Factor, R')
-    R = incomplete_cholesky_factorization(A_neg)
+    R = incomplete_cholesky_factorization(A)
     print('Finding R inverse')
     R_inverse = np.linalg.inv(R)
     print('Finding Inverse of Transpose of R')
@@ -192,11 +206,22 @@ if __name__ == '__main__':
 
     # Precondition Matrix:
     print('Preconditioning Matrix')
-    A_hat = np.matmul(np.matmul(R_transpose_inverse, A_neg), R_inverse)
-    b_hat = np.matmul(R_transpose_inverse, b_neg)
+    A_hat = np.matmul(np.matmul(R_transpose_inverse, A), R_inverse)
+    b_hat = np.matmul(R_transpose_inverse, b)
 
+    # Get approximate solution
+    x_guess = ellipse.create_guess_vector(xgrid, ygrid)
+    guess_surface = np.zeros(xgrid.shape)
+    for k in range(x_guess.shape[0]):
+        i = k % xgrid.shape[0]
+        j = k // xgrid.shape[0]
+        guess_surface[i,j] = x_guess[k]
+    plot_heatmap(xgrid, ygrid, guess_surface, 'results/project3/heatmap-guess.png')
+    plot_surface(xgrid, ygrid, guess_surface, 'results/project3/surface-guess.png')
+
+    # Perform Conjugate Gradient
     print('Performing conjugate gradient')
-    x_hat = conjugate_gradient(A_hat, b_hat, cutoff)
+    x_hat = conjugate_gradient(A_hat, b_hat, cutoff, x_guess)
 
     x = np.matmul(R_inverse, x_hat)
     with open('results/project3/x.np', 'w') as f:
