@@ -172,7 +172,7 @@ def build_soe_matrix(omega, xgrid, ygrid, gridstep):
 if __name__ == '__main__':
 
     # distance between grid points
-    GRIDSTEP = 0.02
+    GRIDSTEP = 0.05
 
     # Residual cutoff point
     cutoff = 10**(-7)
